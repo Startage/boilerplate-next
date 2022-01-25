@@ -1,4 +1,8 @@
+import { ACCESS_TOKEN_NAME } from '@/common/consts/api';
+import { AccessDeniedErrorName } from '@/common/consts/errors';
+import { PAGE_AUTH_LOGIN } from '@/common/consts/pages';
 import { AuthProvider } from '@/common/contexts/auth-context';
+import { httpRefreshToken } from '@/modules/auth/api/refresh-token/http-refresh-token';
 import { css } from '@emotion/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { NextPage } from 'next';
@@ -6,6 +10,7 @@ import { AppProps } from 'next/app';
 import { theme } from '@/common/theme';
 import Head from 'next/head';
 import { GlobalStyles } from '@mui/material';
+import { useRouter } from 'next/router';
 import { SnackbarProvider } from 'notistack';
 import { useState } from 'react';
 import * as Yup from 'yup';
@@ -19,7 +24,25 @@ type AppPropsWithLayout = AppProps & {
 };
 
 function App({ Component, pageProps }: AppPropsWithLayout) {
-  const [queryClient] = useState(() => new QueryClient());
+  const router = useRouter();
+  const handleGlobalError = (err: any) => {
+    if (err.name === AccessDeniedErrorName) {
+      if (router.pathname !== PAGE_AUTH_LOGIN) router.replace(PAGE_AUTH_LOGIN);
+    }
+  };
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          mutations: {
+            onError: handleGlobalError,
+          },
+          queries: {
+            onError: handleGlobalError,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

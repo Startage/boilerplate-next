@@ -1,14 +1,6 @@
-import { Link } from '@/common/components';
 import { DashboardContext } from '@/common/contexts/dashboard-context';
-import {
-  alpha,
-  Box,
-  Collapse,
-  Icon,
-  List,
-  ListItemText,
-  useTheme,
-} from '@mui/material';
+import { alpha, Collapse, List, ListItemText, useTheme } from '@mui/material';
+import { useRouter } from 'next/router';
 import React, { useContext, useState } from 'react';
 import { MdKeyboardArrowDown, MdKeyboardArrowLeft } from 'react-icons/md';
 
@@ -33,6 +25,7 @@ const DashboardSidebarNavItem = ({
   subNavItems,
 }: Props) => {
   const theme = useTheme();
+  const router = useRouter();
   const { activeRoutePathname } = useContext(DashboardContext);
   const isActiveRoot =
     activeRoutePathname === path ||
@@ -40,13 +33,14 @@ const DashboardSidebarNavItem = ({
       console.log(activeRoutePathname === subItem.path);
       return subItem.path === activeRoutePathname;
     });
-  const find = subNavItems?.find((subItem) => {
-    return subItem.path === activeRoutePathname;
-  });
   const [open, setOpen] = useState(isActiveRoot);
 
   const handleOpen = () => {
     setOpen((prev) => !prev);
+  };
+
+  const handleNavigation = (page: string) => {
+    router.push(page);
   };
 
   const activeRootStyle = {
@@ -84,8 +78,9 @@ const DashboardSidebarNavItem = ({
                 <ListItem
                   key={title}
                   css={isActiveSub && activeSubStyle}
-                  component={Link}
-                  href={path}
+                  onClick={() => {
+                    handleNavigation(path as string);
+                  }}
                 >
                   <ListItemIcon
                     css={
@@ -108,9 +103,10 @@ const DashboardSidebarNavItem = ({
 
   return (
     <ListItem
+      onClick={() => {
+        handleNavigation(path as string);
+      }}
       css={isActiveRoot && activeRootStyle}
-      component={Link}
-      href={path}
     >
       <ListItemIcon>{icon && icon}</ListItemIcon>
       <ListItemText disableTypography primary={title} />

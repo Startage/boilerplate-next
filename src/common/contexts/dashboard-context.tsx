@@ -1,4 +1,7 @@
+import { REFRESH_TOKEN_NAME } from '@/common/consts/api';
+import { PAGE_AUTH_LOGIN } from '@/common/consts/pages';
 import { useRouter } from 'next/router';
+import { parseCookies } from 'nookies';
 import React, { createContext, useEffect, useState } from 'react';
 
 type DashboardContextProps = {
@@ -20,10 +23,22 @@ export const DashboardProvider = ({ children }: Props) => {
   const [activeRoutePathname, setActiveRoutePathname] = useState<string | null>(
     null,
   );
+  const [isLoadingFirstRender, setIsLoadingFirstRender] = useState(true);
 
   useEffect(() => {
     setActiveRoutePathname(router.pathname.replace('/[id]', ''));
   }, [router.pathname]);
+
+  useEffect(() => {
+    const { [REFRESH_TOKEN_NAME]: refreshToken } = parseCookies();
+    if (!refreshToken) {
+      router.push(PAGE_AUTH_LOGIN);
+    } else {
+      setIsLoadingFirstRender(false);
+    }
+  }, []);
+
+  if (isLoadingFirstRender) return null;
 
   return (
     <DashboardContext.Provider

@@ -1,7 +1,7 @@
 import { DRAWER_WIDTH } from '@/common/consts/dashboard';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Theme } from '@mui/material';
+import { Menu as MuiMenu, Theme } from '@mui/material';
 import { Scrollbar as DefaultScrollbar } from '@/common/components/';
 
 export const Root = styled.div`
@@ -23,11 +23,22 @@ export const Account = styled.div`
   `}
 `;
 
+export const Menu = styled(MuiMenu)`
+  ${css`
+    div {
+      width: 100%;
+      max-width: 240px;
+    }
+  `}
+`;
+
 export const Scrollbar = styled(DefaultScrollbar)`
-  height: 100%;
-  & .simplebar-content {
+  ${css`
     height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
+    & .simplebar-content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  `}
 `;

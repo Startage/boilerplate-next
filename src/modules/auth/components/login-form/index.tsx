@@ -1,6 +1,9 @@
 import { Error, Input, InputPassword, Link } from '@/common/components';
 import { PendingEmailConfirmationErrorName } from '@/common/consts/errors';
-import { PAGE_CUSTOMER_DASHBOARD } from '@/common/consts/pages';
+import {
+  PAGE_AUTH_FORGOT_PASSWORD,
+  PAGE_CUSTOMER_DASHBOARD,
+} from '@/common/consts/pages';
 import { AuthContext } from '@/common/contexts/auth-context';
 import { ResendConfirmationEmail } from '@/modules/auth/components/resend-confirmation-email';
 import { LoginData } from '@/modules/auth/types/login-data';
@@ -70,7 +73,7 @@ export const LoginForm = () => {
             justifyContent="flex-end"
             sx={{ my: 2 }}
           >
-            <Link href="/auth/forgot-password">Perdeu a senha?</Link>
+            <Link href={PAGE_AUTH_FORGOT_PASSWORD}>Perdeu a senha?</Link>
           </Stack>
 
           <LoadingButton
