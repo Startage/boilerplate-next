@@ -1,7 +1,7 @@
 import { nextPrivatePage } from '@/common/helpers/next-private-page';
 import { ProfileModel } from '@/common/models/profile-model';
 import { DashboardTemplate } from '@/common/templates/dashboard-template';
-import { httpLoadProfile } from '@/modules/auth/api/profile/http-load-profile';
+import { httpLoadProfile } from '@/modules/auth/api/load-profile/http-load-profile';
 import { Button, Typography } from '@mui/material';
 import { GetServerSideProps } from 'next';
 import React from 'react';
@@ -29,19 +29,10 @@ export default function Dashboard() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return nextPrivatePage({
-    ctx,
-    onSuccess: async () => {
-      try {
-        const profile = await httpLoadProfile();
-        console.log(profile);
-      } catch (err) {
-        console.log('EROOR PROFILE WTF');
-      }
-      return {
-        props: {},
-      };
-    },
-  });
-};
+export const getServerSideProps: GetServerSideProps = nextPrivatePage(
+  async () => {
+    return {
+      props: {},
+    };
+  },
+);

@@ -6,44 +6,28 @@ import {
 } from '@/common/consts/api';
 import { httpRefreshToken } from '@/modules/auth/api/refresh-token/http-refresh-token';
 import { AxiosInstance } from 'axios';
-import { GetServerSidePropsContext } from 'next/types';
+import {
+  GetServerSidePropsContext,
+  GetServerSidePropsResult,
+} from 'next/types';
 import nookies, { parseCookies } from 'nookies';
 
-export const nextPrivatePage = async ({
-  ctx,
-  onSuccess,
-}: {
-  ctx: GetServerSidePropsContext;
-  onSuccess: (axios: AxiosInstance) => { props: any } | Promise<{ props: any }>;
-}) => {
-  const {
-    [REFRESH_TOKEN_NAME]: refreshToken,
-    [ACCESS_TOKEN_NAME]: accessToken,
-  } = parseCookies(ctx);
-
-  if (!refreshToken) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
+export const nextPrivatePage =
+  <P = Record<string, any>>(
+    onSuccess: (
+      ctx: GetServerSidePropsContext,
+      config: {
+        axios: AxiosInstance;
       },
-    };
-  }
+    ) => Promise<GetServerSidePropsResult<P>>,
+  ) =>
+  async (ctx: GetServerSidePropsContext) => {
+    const {
+      [REFRESH_TOKEN_NAME]: refreshToken,
+      [ACCESS_TOKEN_NAME]: accessToken,
+    } = parseCookies(ctx);
 
-  const axios = getAuthorizedApiInstance(ctx);
-  if (!accessToken) {
-    try {
-      const { accessToken: refreshedAccessToken } = await httpRefreshToken(
-        { refreshTokenId: refreshToken },
-        ctx,
-      );
-      nookies.set(ctx, ACCESS_TOKEN_NAME, refreshedAccessToken, {
-        maxAge: DEFAULT_EXPIRE_ACCESS_TOKEN_TOKEN,
-      });
-      axios.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${refreshedAccessToken}`;
-    } catch (err) {
+    if (!refreshToken) {
       return {
         redirect: {
           destination: '/',
@@ -51,7 +35,31 @@ export const nextPrivatePage = async ({
         },
       };
     }
-  }
 
-  return onSuccess(axios);
-};
+    const axios = getAuthorizedApiInstance(ctx);
+    if (!accessToken) {
+      try {
+        const { accessToken: refreshedAccessToken } = await httpRefreshToken(
+          { refreshTokenId: refreshToken },
+          ctx,
+        );
+        nookies.set(ctx, ACCESS_TOKEN_NAME, refreshedAccessToken, {
+          maxAge: DEFAULT_EXPIRE_ACCESS_TOKEN_TOKEN,
+        });
+        axios.defaults.headers.common[
+          'Authorization'
+        ] = `Bearer ${refreshedAccessToken}`;
+      } catch (err) {
+        return {
+          redirect: {
+            destination: '/',
+            permanent: false,
+          },
+        };
+      }
+    }
+
+    return onSuccess(ctx, {
+      axios,
+    });
+  };

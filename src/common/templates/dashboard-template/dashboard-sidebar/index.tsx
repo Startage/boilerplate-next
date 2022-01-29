@@ -1,10 +1,14 @@
 import { DRAWER_WIDTH } from '@/common/consts/dashboard';
+import { PAGE_CUSTOMER_PROFILE } from '@/common/consts/pages';
 import { AuthContext } from '@/common/contexts/auth-context';
 import { DashboardContext } from '@/common/contexts/dashboard-context';
 import { DashboardSidebarNav } from '@/common/templates/dashboard-template/dashboard-sidebar/dashboard-sidebar-nav';
+import { httpLoadProfile } from '@/modules/auth/api/load-profile/http-load-profile';
+import { LOAD_PROFILE_QUERY } from '@/modules/auth/consts/queries';
 import {
   Avatar,
   Box,
+  Divider,
   Drawer,
   Hidden,
   IconButton,
@@ -12,8 +16,10 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useContext } from 'react';
 import { MdKeyboardArrowDown } from 'react-icons/md';
+import { useQuery } from 'react-query';
 
 import { Root, Account, Scrollbar, Menu } from './styles';
 
@@ -22,12 +28,18 @@ const DashboardSidebar = () => {
   const open = Boolean(anchorEl);
   const { isOpenSidebar, onCloseSidebar } = useContext(DashboardContext);
   const { onOpenLogout } = useContext(AuthContext);
+  const router = useRouter();
+  const { data: profile } = useQuery(LOAD_PROFILE_QUERY, httpLoadProfile);
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleNavigateTo = (page: string) => {
+    router.push(page);
   };
 
   const renderContent = (
@@ -40,10 +52,10 @@ const DashboardSidebar = () => {
 
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Account onClick={handleClick}>
-          <Avatar />
+          <Avatar src={profile?.avatarUrl} />
           <Box sx={{ ml: 2 }}>
             <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-              Junior Miranda
+              {profile?.name}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               dev
@@ -65,7 +77,10 @@ const DashboardSidebar = () => {
           }}
         >
           {/*<MenuItem onClick={handleClose}>Profile</MenuItem>*/}
-          {/*<MenuItem onClick={handleClose}>My account</MenuItem>*/}
+          <MenuItem onClick={() => handleNavigateTo(PAGE_CUSTOMER_PROFILE)}>
+            Minha Conta
+          </MenuItem>
+          <Divider light />
           <MenuItem onClick={onOpenLogout}>Logout</MenuItem>
         </Menu>
       </Box>

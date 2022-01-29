@@ -6,7 +6,7 @@ import {
 import { httpSignup } from '@/modules/auth/api/signup/http-signup';
 import { SignupData } from '@/modules/auth/types/signup-data';
 import { Stack } from '@mui/material';
-import { Form, Formik } from 'formik';
+import { FormikProvider, useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useMutation, useQueryClient } from 'react-query';
@@ -53,50 +53,50 @@ export const SignupForm = () => {
     });
   };
 
-  return (
-    <Formik
-      initialValues={{
-        email: '',
-        password: '',
-        phone: '',
-        name: '',
-        passwordConfirmation: '',
-      }}
-      validationSchema={SignupSchema}
-      onSubmit={handleSubmit}
-    >
-      <Form autoComplete={'off'}>
-        <Stack spacing={3}>
-          <Input fullWidth label={'Nome'} name={'name'} />
-          <Input fullWidth label={'Email'} name={'email'} />
-          <Input fullWidth label={'Telefone'} mask={'phone'} name={'phone'} />
-          <InputPassword fullWidth label={'Senha'} name={'password'} />
-          <InputPassword
-            fullWidth
-            label={'Confirmar Senha'}
-            name={'passwordConfirmation'}
-          />
-          <Error error={error} />
-        </Stack>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="flex-end"
-          sx={{ my: 2 }}
-        >
-          <Link href={PAGE_AUTH_LOGIN}>Já possui conta?</Link>
-        </Stack>
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      phone: '',
+      name: '',
+      passwordConfirmation: '',
+    },
+    validationSchema: SignupSchema,
+    onSubmit: handleSubmit,
+  });
 
-        <LoadingButton
+  return (
+    <FormikProvider value={formik}>
+      <Stack spacing={3}>
+        <Input fullWidth label={'Nome'} name={'name'} />
+        <Input fullWidth label={'Email'} name={'email'} />
+        <Input fullWidth label={'Telefone'} mask={'phone'} name={'phone'} />
+        <InputPassword fullWidth label={'Senha'} name={'password'} />
+        <InputPassword
           fullWidth
-          size="large"
-          loading={isLoading}
-          variant={'contained'}
-          type={'submit'}
-        >
-          Cadastrar
-        </LoadingButton>
-      </Form>
-    </Formik>
+          label={'Confirmar Senha'}
+          name={'passwordConfirmation'}
+        />
+        <Error error={error} />
+      </Stack>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="flex-end"
+        sx={{ my: 2 }}
+      >
+        <Link href={PAGE_AUTH_LOGIN}>Já possui conta?</Link>
+      </Stack>
+
+      <LoadingButton
+        fullWidth
+        size="large"
+        loading={isLoading}
+        variant={'contained'}
+        onClick={formik.submitForm}
+      >
+        Cadastrar
+      </LoadingButton>
+    </FormikProvider>
   );
 };

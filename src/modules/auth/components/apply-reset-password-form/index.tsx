@@ -1,10 +1,10 @@
-import { Input, InputPassword } from '@/common/components';
+import { InputPassword } from '@/common/components';
 import { PAGE_AUTH_RESET_PASSWORD_SUCCESSFUL } from '@/common/consts/pages';
 import { httpApplyResetPassword } from '@/modules/auth/api/apply-reset-password/http-apply-reset-password';
 import { ApplyResetPasswordData } from '@/modules/auth/types/apply-reset-password-data';
 import { LoadingButton } from '@mui/lab';
 import { Stack } from '@mui/material';
-import { Form, Formik } from 'formik';
+import { FormikProvider, useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -46,35 +46,36 @@ const ApplyResetPasswordForm = () => {
     });
   };
 
+  const formik = useFormik({
+    initialValues: {
+      passwordConfirmation: '',
+      password: '',
+    },
+    enableReinitialize: true,
+    onSubmit: handleSubmit,
+    validationSchema: ForgotPasswordSchema,
+  });
+
   return (
-    <Formik
-      initialValues={{
-        password: '',
-        passwordConfirmation: '',
-      }}
-      validationSchema={ForgotPasswordSchema}
-      onSubmit={handleSubmit}
-    >
-      <Form autoComplete={'off'}>
-        <Stack spacing={3}>
-          <InputPassword fullWidth label={'Senha'} name={'password'} />
-          <InputPassword
-            fullWidth
-            label={'Confirmar Senha'}
-            name={'passwordConfirmation'}
-          />
-          <LoadingButton
-            fullWidth
-            size="large"
-            loading={isLoading}
-            variant={'contained'}
-            type={'submit'}
-          >
-            Alterar senha
-          </LoadingButton>
-        </Stack>
-      </Form>
-    </Formik>
+    <FormikProvider value={formik}>
+      <Stack spacing={3}>
+        <InputPassword fullWidth label={'Senha'} name={'password'} />
+        <InputPassword
+          fullWidth
+          label={'Confirmar Senha'}
+          name={'passwordConfirmation'}
+        />
+        <LoadingButton
+          fullWidth
+          size="large"
+          loading={isLoading}
+          variant={'contained'}
+          type={'submit'}
+        >
+          Alterar senha
+        </LoadingButton>
+      </Stack>
+    </FormikProvider>
   );
 };
 

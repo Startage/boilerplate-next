@@ -4,7 +4,7 @@ import { httpRequestResetPassword } from '@/modules/auth/api/request-request-pas
 import { RequestForgotPasswordData } from '@/modules/auth/types/request-forgot-password-data';
 import { LoadingButton } from '@mui/lab';
 import { Stack } from '@mui/material';
-import { Form, Formik } from 'formik';
+import { FormikProvider, useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -35,29 +35,29 @@ const ForgotPasswordForm = () => {
     });
   };
 
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+    },
+    onSubmit: handleSubmit,
+    validationSchema: ForgotPasswordSchema,
+  });
+
   return (
-    <Formik
-      initialValues={{
-        email: '',
-      }}
-      validationSchema={ForgotPasswordSchema}
-      onSubmit={handleSubmit}
-    >
-      <Form autoComplete={'off'}>
-        <Stack spacing={3}>
-          <Input fullWidth label={'Email'} name={'email'} />
-          <LoadingButton
-            fullWidth
-            size="large"
-            loading={isLoading}
-            variant={'contained'}
-            type={'submit'}
-          >
-            Enviar email
-          </LoadingButton>
-        </Stack>
-      </Form>
-    </Formik>
+    <FormikProvider value={formik}>
+      <Stack spacing={3}>
+        <Input fullWidth label={'Email'} name={'email'} />
+        <LoadingButton
+          fullWidth
+          size="large"
+          loading={isLoading}
+          variant={'contained'}
+          onClick={formik.submitForm}
+        >
+          Enviar email
+        </LoadingButton>
+      </Stack>
+    </FormikProvider>
   );
 };
 

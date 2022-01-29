@@ -4,15 +4,12 @@ import {
   DEFAULT_EXPIRE_ACCESS_TOKEN_TOKEN,
   REFRESH_TOKEN_NAME,
 } from '@/common/consts/api';
-import { AuthContext } from '@/common/contexts/auth-context';
 import { AccessDeniedError } from '@/common/errors';
 import { httpRefreshToken } from '@/modules/auth/api/refresh-token/http-refresh-token';
 import axios, { AxiosResponse } from 'axios';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-import { NextRouter } from 'next/dist/shared/lib/router/router';
 import { GetServerSidePropsContext } from 'next/types';
 import { destroyCookie, parseCookies, setCookie } from 'nookies';
-import { useContext } from 'react';
 
 export const makeApiUrl = (path = ''): string => {
   return `${API_URL}${path}`;

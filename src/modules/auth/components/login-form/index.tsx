@@ -1,15 +1,12 @@
 import { Error, Input, InputPassword, Link } from '@/common/components';
 import { PendingEmailConfirmationErrorName } from '@/common/consts/errors';
-import {
-  PAGE_AUTH_FORGOT_PASSWORD,
-  PAGE_CUSTOMER_DASHBOARD,
-} from '@/common/consts/pages';
+import { PAGE_AUTH_FORGOT_PASSWORD } from '@/common/consts/pages';
 import { AuthContext } from '@/common/contexts/auth-context';
 import { ResendConfirmationEmail } from '@/modules/auth/components/resend-confirmation-email';
+import { LOAD_PROFILE_QUERY } from '@/modules/auth/consts/queries';
 import { LoginData } from '@/modules/auth/types/login-data';
 import { Stack } from '@mui/material';
-import { Form, Formik } from 'formik';
-import { useRouter } from 'next/router';
+import { FormikProvider, useFormik } from 'formik';
 import React, { useContext, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import * as Yup from 'yup';
@@ -29,7 +26,7 @@ export const LoginForm = () => {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries('profile');
+      queryClient.invalidateQueries(LOAD_PROFILE_QUERY);
     },
   });
   const LoginSchema = Yup.object().shape({
@@ -44,49 +41,47 @@ export const LoginForm = () => {
     });
   };
 
-  return (
-    <Formik
-      initialValues={{
-        email: '',
-        password: '',
-      }}
-      validationSchema={LoginSchema}
-      onSubmit={handleSubmit}
-    >
-      {({ values }) => (
-        <Form autoComplete={'off'}>
-          <ResendConfirmationEmail
-            isOpen={isOpenResendConfirmationEmail}
-            handleClose={() => {
-              setIsOpenResendConfirmationEmail(false);
-            }}
-            email={values.email}
-          />
-          <Stack spacing={3}>
-            <Input fullWidth label={'Email'} name={'email'} />
-            <InputPassword fullWidth label={'Senha'} name={'password'} />
-            <Error error={error} />
-          </Stack>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="flex-end"
-            sx={{ my: 2 }}
-          >
-            <Link href={PAGE_AUTH_FORGOT_PASSWORD}>Perdeu a senha?</Link>
-          </Stack>
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: LoginSchema,
+    onSubmit: handleSubmit,
+  });
 
-          <LoadingButton
-            fullWidth
-            size="large"
-            loading={isLoading}
-            variant={'contained'}
-            type={'submit'}
-          >
-            Acessar
-          </LoadingButton>
-        </Form>
-      )}
-    </Formik>
+  return (
+    <FormikProvider value={formik}>
+      <ResendConfirmationEmail
+        isOpen={isOpenResendConfirmationEmail}
+        handleClose={() => {
+          setIsOpenResendConfirmationEmail(false);
+        }}
+        email={formik.values.email}
+      />
+      <Stack spacing={3}>
+        <Input fullWidth label={'Email'} name={'email'} />
+        <InputPassword fullWidth label={'Senha'} name={'password'} />
+        <Error error={error} />
+      </Stack>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="flex-end"
+        sx={{ my: 2 }}
+      >
+        <Link href={PAGE_AUTH_FORGOT_PASSWORD}>Perdeu a senha?</Link>
+      </Stack>
+
+      <LoadingButton
+        fullWidth
+        size="large"
+        loading={isLoading}
+        variant={'contained'}
+        onClick={formik.submitForm}
+      >
+        Acessar
+      </LoadingButton>
+    </FormikProvider>
   );
 };

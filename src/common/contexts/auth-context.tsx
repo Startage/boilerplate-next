@@ -8,7 +8,7 @@ import {
 import { PAGE_CUSTOMER_DASHBOARD } from '@/common/consts/pages';
 import { ProfileModel } from '@/common/models/profile-model';
 import { httpLogin } from '@/modules/auth/api/login/http-login';
-import { httpLoadProfile } from '@/modules/auth/api/profile/http-load-profile';
+import { httpLoadProfile } from '@/modules/auth/api/load-profile/http-load-profile';
 import { LoginData } from '@/modules/auth/types/login-data';
 import { useRouter } from 'next/router';
 import { destroyCookie, parseCookies, setCookie } from 'nookies';

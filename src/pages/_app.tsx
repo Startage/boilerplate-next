@@ -1,8 +1,6 @@
-import { ACCESS_TOKEN_NAME } from '@/common/consts/api';
 import { AccessDeniedErrorName } from '@/common/consts/errors';
 import { PAGE_AUTH_LOGIN } from '@/common/consts/pages';
 import { AuthProvider } from '@/common/contexts/auth-context';
-import { httpRefreshToken } from '@/modules/auth/api/refresh-token/http-refresh-token';
 import { css } from '@emotion/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { NextPage } from 'next';
